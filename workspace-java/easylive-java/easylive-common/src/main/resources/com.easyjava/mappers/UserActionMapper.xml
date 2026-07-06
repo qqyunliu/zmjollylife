@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easyjava.mappers.UserActionMapper">
+    
+    <resultMap id="base_result_map" type="com.easyjava.entity.po.UserAction">
+        <result column="action_id" property="actionId"/>
+        <result column="video_id" property="videoId"/>
+        <result column="video_user_id" property="videoUserId"/>
+        <result column="comment_id" property="commentId"/>
+        <result column="action_type" property="actionType"/>
+        <result column="user_id" property="userId"/>
+        <result column="action_time" property="actionTime"/>
+    </resultMap>
+    
+    <select id="selectByVideoIdAndUserIdAndType" resultMap="base_result_map">
+        SELECT * FROM user_action 
+        WHERE video_id = #{videoId} 
+        AND user_id = #{userId} 
+        AND action_type = #{actionType}
+    </select>
+    
+    <delete id="deleteByVideoIdAndUserIdAndType">
+        DELETE FROM user_action 
+        WHERE video_id = #{videoId} 
+        AND user_id = #{userId} 
+        AND action_type = #{actionType}
+    </delete>
+    
+    <select id="selectCountByVideoIdAndType" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user_action 
+        WHERE video_id = #{videoId} 
+        AND action_type = #{actionType}
+    </select>
+
+    <delete id="deleteByVideoId">
+        DELETE FROM user_action
+        WHERE video_id = #{videoId}
+    </delete>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="actionId">
+        INSERT INTO user_action (video_id, video_user_id, comment_id, action_type, user_id, action_time)
+        VALUES (#{bean.videoId}, #{bean.videoUserId}, #{bean.commentId}, #{bean.actionType}, #{bean.userId}, #{bean.actionTime})
+    </insert>
+    
+    <select id="selectListByUserIdAndType" resultMap="base_result_map">
+        SELECT * FROM user_action 
+        WHERE user_id = #{userId} 
+        AND action_type = #{actionType}
+        ORDER BY action_time DESC
+    </select>
+</mapper>

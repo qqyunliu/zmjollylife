@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easyjava.mappers.UserFocusMapper">
+    
+    <resultMap id="base_result_map" type="com.easyjava.entity.po.UserFocus">
+        <result column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="focus_user_id" property="focusUserId"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <select id="selectListByUserId" resultMap="base_result_map">
+        SELECT * FROM user_focus 
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+    
+    <select id="selectListByFocusUserId" resultMap="base_result_map">
+        SELECT * FROM user_focus 
+        WHERE focus_user_id = #{focusUserId}
+        ORDER BY create_time DESC
+    </select>
+    
+    <select id="selectByUserIdAndFocusUserId" resultMap="base_result_map">
+        SELECT * FROM user_focus 
+        WHERE user_id = #{userId} AND focus_user_id = #{focusUserId}
+    </select>
+    
+    <delete id="deleteByUserIdAndFocusUserId">
+        DELETE FROM user_focus 
+        WHERE user_id = #{userId} AND focus_user_id = #{focusUserId}
+    </delete>
+    
+    <select id="selectCountByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user_focus WHERE user_id = #{userId}
+    </select>
+    
+    <select id="selectCountByFocusUserId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user_focus WHERE focus_user_id = #{focusUserId}
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_focus (user_id, focus_user_id, create_time)
+        VALUES (#{bean.userId}, #{bean.focusUserId}, #{bean.createTime})
+    </insert>
+</mapper>

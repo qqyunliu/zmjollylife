@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easyjava.mappers.PlayHistoryMapper">
+    
+    <resultMap id="base_result_map" type="com.easyjava.entity.po.PlayHistory">
+        <result column="id" property="id"/>
+        <result column="video_id" property="videoId"/>
+        <result column="user_id" property="userId"/>
+        <result column="play_time" property="playTime"/>
+        <result column="progress" property="progress"/>
+    </resultMap>
+    
+    <select id="selectListByUserId" resultMap="base_result_map">
+        SELECT * FROM play_history 
+        WHERE user_id = #{userId}
+        ORDER BY play_time DESC
+    </select>
+    
+    <select id="selectByVideoIdAndUserId" resultMap="base_result_map">
+        SELECT * FROM play_history 
+        WHERE video_id = #{videoId} AND user_id = #{userId}
+    </select>
+    
+    <delete id="deleteById">
+        DELETE FROM play_history WHERE id = #{id}
+    </delete>
+    
+    <delete id="deleteAllByUserId">
+        DELETE FROM play_history WHERE user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByVideoId">
+        DELETE FROM play_history WHERE video_id = #{videoId}
+    </delete>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO play_history (video_id, user_id, play_time, progress)
+        VALUES (#{bean.videoId}, #{bean.userId}, #{bean.playTime}, #{bean.progress})
+    </insert>
+    
+    <update id="update">
+        UPDATE play_history SET play_time = #{bean.playTime}, progress = #{bean.progress}
+        WHERE video_id = #{bean.videoId} AND user_id = #{bean.userId}
+    </update>
+</mapper>

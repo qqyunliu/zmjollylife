@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easyjava.mappers.VideoCommentMapper">
+    
+    <resultMap id="base_result_map" type="com.easyjava.entity.po.VideoComment">
+        <result column="comment_id" property="commentId"/>
+        <result column="p_comment_id" property="pCommentId"/>
+        <result column="video_id" property="videoId"/>
+        <result column="video_user_id" property="videoUserId"/>
+        <result column="content" property="content"/>
+        <result column="img_path" property="imgPath"/>
+        <result column="user_id" property="userId"/>
+        <result column="reply_user_id" property="replyUserId"/>
+        <result column="top_type" property="topType"/>
+        <result column="post_time" property="postTime"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="hate_count" property="hateCount"/>
+        <result column="status" property="status"/>
+        <result column="nick_id" property="nickName"/>
+        <result column="nick_id" property="nickId"/>
+        <result column="avatar" property="avatar"/>
+        <result column="reply_nick_id" property="replyNickName"/>
+        <result column="reply_nick_id" property="replyNickId"/>
+    </resultMap>
+    
+    <select id="selectListByVideoId" resultMap="base_result_map">
+        SELECT c.*,
+               u.nick_id AS nick_id,
+               u.avatar AS avatar,
+               ru.nick_id AS reply_nick_id
+        FROM video_comment c
+        LEFT JOIN user_info u ON c.user_id = u.user_id
+        LEFT JOIN user_info ru ON c.reply_user_id = ru.user_id
+        WHERE c.video_id = #{bean.videoId} AND c.p_comment_id = 0 AND c.status = 0
+        <if test="bean.sortType != null and bean.sortType == 0">
+        ORDER BY c.top_type DESC, c.like_count DESC, c.post_time DESC
+        </if>
+        <if test="bean.sortType != null and bean.sortType == 1">
+        ORDER BY c.top_type DESC, c.post_time DESC
+        </if>
+        <if test="bean.pageSize != null and bean.pageNo != null">
+        LIMIT ${bean.pageSize} OFFSET ${bean.offset}
+        </if>
+    </select>
+    
+    <select id="selectCountByVideoId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM video_comment 
+        WHERE video_id = #{videoId} AND p_comment_id = 0 AND status = 0
+    </select>
+
+    <select id="selectAllCountByVideoId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM video_comment
+        WHERE video_id = #{videoId} AND status = 0
+    </select>
+
+    <select id="selectAllCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM video_comment
+    </select>
+    
+    <select id="selectListByPCommentId" resultMap="base_result_map">
+        SELECT c.*,
+               u.nick_id AS nick_id,
+               u.avatar AS avatar,
+               ru.nick_id AS reply_nick_id
+        FROM video_comment c
+        LEFT JOIN user_info u ON c.user_id = u.user_id
+        LEFT JOIN user_info ru ON c.reply_user_id = ru.user_id
+        WHERE c.p_comment_id = #{pCommentId} AND c.status = 0
+        ORDER BY c.post_time ASC
+    </select>
+
+    <select id="selectListByUserId" resultMap="base_result_map_with_video">
+        SELECT c.*,
+               v.video_name AS video_name,
+               u.nick_id AS nick_id,
+               u.avatar AS avatar,
+               ru.nick_id AS reply_nick_id
+        FROM video_comment c
+        LEFT JOIN tb_video_info v ON c.video_id = v.video_id
+        LEFT JOIN user_info u ON c.user_id = u.user_id
+        LEFT JOIN user_info ru ON c.reply_user_id = ru.user_id
+        WHERE c.user_id = #{bean.userId} AND c.status = 0
+        <if test="bean.content != null and bean.content != ''">
+            AND c.content LIKE concat('%', #{bean.content}, '%')
+        </if>
+        ORDER BY c.post_time DESC
+        <if test="bean.pageSize != null and bean.pageNo != null">
+            LIMIT ${bean.pageSize} OFFSET ${bean.offset}
+        </if>
+    </select>
+
+    <resultMap id="base_result_map_with_video" type="com.easyjava.entity.po.VideoComment" extends="base_result_map">
+        <result column="video_name" property="videoName"/>
+    </resultMap>
+
+    <select id="selectCountByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM video_comment c
+        WHERE c.user_id = #{userId} AND c.status = 0
+        <if test="content != null and content != ''">
+            AND c.content LIKE concat('%', #{content}, '%')
+        </if>
+    </select>
+    
+    <select id="selectById" resultMap="base_result_map">
+        SELECT c.*,
+               u.nick_id AS nick_id,
+               u.avatar AS avatar,
+               ru.nick_id AS reply_nick_id
+        FROM video_comment c
+        LEFT JOIN user_info u ON c.user_id = u.user_id
+        LEFT JOIN user_info ru ON c.reply_user_id = ru.user_id
+        WHERE c.comment_id = #{commentId}
+    </select>
+    
+    <delete id="deleteById">
+        DELETE FROM video_comment WHERE comment_id = #{commentId}
+    </delete>
+
+    <delete id="deleteByVideoId">
+        DELETE FROM video_comment WHERE video_id = #{videoId}
+    </delete>
+    
+    <update id="updateLikeCount">
+        UPDATE video_comment SET like_count = like_count + #{count} WHERE comment_id = #{commentId}
+    </update>
+    
+    <update id="updateHateCount">
+        UPDATE video_comment SET hate_count = hate_count + #{count} WHERE comment_id = #{commentId}
+    </update>
+    
+    <update id="updateTopType">
+        UPDATE video_comment SET top_type = #{topType} WHERE comment_id = #{commentId}
+    </update>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="commentId">
+        INSERT INTO video_comment (p_comment_id, video_id, video_user_id, content, img_path, user_id, reply_user_id, top_type, post_time, like_count, hate_count, status)
+        VALUES (#{bean.pCommentId}, #{bean.videoId}, #{bean.videoUserId}, #{bean.content}, #{bean.imgPath}, #{bean.userId}, #{bean.replyUserId}, 0, #{bean.postTime}, 0, 0, 0)
+    </insert>
+
+    <!-- Admin: list all comments with user info -->
+    <select id="selectAdminList" resultMap="base_result_map_with_video">
+        SELECT c.*,
+               v.video_name AS video_name,
+               u.nick_id AS nick_id,
+               u.avatar AS avatar,
+               ru.nick_id AS reply_nick_id
+        FROM video_comment c
+        LEFT JOIN tb_video_info v ON c.video_id = v.video_id
+        LEFT JOIN user_info u ON c.user_id = u.user_id
+        LEFT JOIN user_info ru ON c.reply_user_id = ru.user_id
+        WHERE 1=1
+        <if test="bean.content != null and bean.content != ''">
+            AND c.content LIKE concat('%', #{bean.content}, '%')
+        </if>
+        ORDER BY c.post_time DESC
+        <if test="bean.pageSize != null and bean.pageNo != null">
+            LIMIT ${bean.pageSize} OFFSET ${bean.offset}
+        </if>
+    </select>
+
+    <select id="selectAdminCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM video_comment c
+        WHERE 1=1
+        <if test="bean.content != null and bean.content != ''">
+            AND c.content LIKE concat('%', #{bean.content}, '%')
+        </if>
+    </select>
+
+    <update id="updateStatus">
+        UPDATE video_comment SET status = #{status} WHERE comment_id = #{commentId}
+    </update>
+</mapper>

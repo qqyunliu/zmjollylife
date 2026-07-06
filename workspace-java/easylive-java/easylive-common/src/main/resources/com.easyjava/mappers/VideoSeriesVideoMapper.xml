@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easyjava.mappers.VideoSeriesVideoMapper">
+    
+    <resultMap id="base_result_map" type="com.easyjava.entity.po.VideoSeriesVideo">
+        <result column="id" property="id"/>
+        <result column="series_id" property="seriesId"/>
+        <result column="video_id" property="videoId"/>
+        <result column="sort" property="sort"/>
+    </resultMap>
+    
+    <select id="selectListBySeriesId" resultMap="base_result_map">
+        SELECT * FROM video_series_video 
+        WHERE series_id = #{seriesId}
+        ORDER BY sort ASC
+    </select>
+    
+    <delete id="deleteBySeriesIdAndVideoId">
+        DELETE FROM video_series_video WHERE series_id = #{seriesId} AND video_id = #{videoId}
+    </delete>
+    
+    <delete id="deleteBySeriesId">
+        DELETE FROM video_series_video WHERE series_id = #{seriesId}
+    </delete>
+
+    <delete id="deleteByVideoId">
+        DELETE FROM video_series_video WHERE video_id = #{videoId}
+    </delete>
+    
+    <update id="updateSort">
+        UPDATE video_series_video SET sort = #{sort} WHERE series_id = #{seriesId} AND video_id = #{videoId}
+    </update>
+    
+    <insert id="insert">
+        INSERT INTO video_series_video (series_id, video_id, sort)
+        VALUES (#{bean.seriesId}, #{bean.videoId}, #{bean.sort})
+    </insert>
+</mapper>

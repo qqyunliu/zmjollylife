@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easyjava.mappers.UserInfoMapper">
+    
+    <resultMap id="base_result_map" type="com.easyjava.entity.po.UserInfo">
+        <result column="user_id" property="userId"/>
+        <result column="nick_id" property="nickId"/>
+        <result column="avatar" property="avatar"/>
+        <result column="sex" property="sex"/>
+        <result column="birthday" property="birthday"/>
+        <result column="school" property="school"/>
+        <result column="person_introduction" property="personIntroduction"/>
+        <result column="notice_info" property="noticeInfo"/>
+    </resultMap>
+    
+    <select id="selectByUserId" resultMap="base_result_map">
+        SELECT * FROM user_info 
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectList" resultMap="base_result_map">
+        SELECT * FROM user_info 
+        <where>
+            <if test="query.userId != null">AND user_id = #{query.userId}</if>
+            <if test="query.userIdFuzzy != null">AND user_id LIKE CONCAT('%', #{query.userIdFuzzy}, '%')</if>
+            <if test="query.nickId != null">AND nick_id = #{query.nickId}</if>
+            <if test="query.nickIdFuzzy != null">AND nick_id LIKE CONCAT('%', #{query.nickIdFuzzy}, '%')</if>
+            <if test="query.sex != null">AND sex = #{query.sex}</if>
+        </where>
+    </select>
+    
+    <update id="updateByUserId">
+        UPDATE user_info 
+        <set>
+            <if test="bean.nickId != null">nick_id = #{bean.nickId},</if>
+            <if test="bean.avatar != null">avatar = #{bean.avatar},</if>
+            <if test="bean.sex != null">sex = #{bean.sex},</if>
+            <if test="bean.birthday != null">birthday = #{bean.birthday},</if>
+            <if test="bean.school != null">school = #{bean.school},</if>
+            <if test="bean.personIntroduction != null">person_introduction = #{bean.personIntroduction},</if>
+            <if test="bean.noticeInfo != null">notice_info = #{bean.noticeInfo},</if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+    
+    <select id="selectListByPage" resultMap="base_result_map">
+        SELECT * FROM user_info 
+        <where>
+            <if test="query.userId != null">AND user_id = #{query.userId}</if>
+            <if test="query.userIdFuzzy != null">AND user_id LIKE CONCAT('%', #{query.userIdFuzzy}, '%')</if>
+            <if test="query.nickId != null">AND nick_id = #{query.nickId}</if>
+            <if test="query.nickIdFuzzy != null">AND nick_id LIKE CONCAT('%', #{query.nickIdFuzzy}, '%')</if>
+            <if test="query.sex != null">AND sex = #{query.sex}</if>
+        </where>
+        <if test="query.orderBy != null">ORDER BY ${query.orderBy}</if>
+        <if test="query.pageNo != null and query.pageSize != null">LIMIT #{query.pageStart}, #{query.pageSize}</if>
+    </select>
+    
+    <select id="selectCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user_info 
+        <where>
+            <if test="query.userId != null">AND user_id = #{query.userId}</if>
+            <if test="query.userIdFuzzy != null">AND user_id LIKE CONCAT('%', #{query.userIdFuzzy}, '%')</if>
+            <if test="query.nickId != null">AND nick_id = #{query.nickId}</if>
+            <if test="query.nickIdFuzzy != null">AND nick_id LIKE CONCAT('%', #{query.nickIdFuzzy}, '%')</if>
+            <if test="query.sex != null">AND sex = #{query.sex}</if>
+        </where>
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user_info (user_id, nick_id, avatar, sex, birthday, school, person_introduction, notice_info)
+        VALUES (#{userId}, #{nickId}, #{avatar}, #{sex}, #{birthday}, #{school}, #{personIntroduction}, #{noticeInfo})
+    </insert>
+</mapper>

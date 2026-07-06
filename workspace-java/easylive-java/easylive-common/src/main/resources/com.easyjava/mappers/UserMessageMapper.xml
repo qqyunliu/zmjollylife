@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easyjava.mappers.UserMessageMapper">
+    
+    <resultMap id="base_result_map" type="com.easyjava.entity.po.UserMessage">
+        <result column="message_id" property="messageId"/>
+        <result column="user_id" property="userId"/>
+        <result column="message_type" property="messageType"/>
+        <result column="from_user_id" property="fromUserId"/>
+        <result column="video_id" property="videoId"/>
+        <result column="comment_id" property="commentId"/>
+        <result column="message_content" property="messageContent"/>
+        <result column="is_read" property="isRead"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <select id="selectListByUserId" resultMap="base_result_map">
+        SELECT * FROM user_message 
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+    
+    <select id="selectNoReadCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user_message 
+        WHERE user_id = #{userId} AND is_read = 0
+    </select>
+    
+    <update id="updateIsRead">
+        UPDATE user_message SET is_read = 1 
+        WHERE user_id = #{userId}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM user_message WHERE message_id = #{messageId}
+    </delete>
+
+    <delete id="deleteByVideoId">
+        DELETE FROM user_message WHERE video_id = #{videoId}
+    </delete>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="messageId">
+        INSERT INTO user_message (user_id, message_type, from_user_id, video_id, comment_id, message_content, is_read, create_time)
+        VALUES (#{bean.userId}, #{bean.messageType}, #{bean.fromUserId}, #{bean.videoId}, #{bean.commentId}, #{bean.messageContent}, 0, #{bean.createTime})
+    </insert>
+</mapper>

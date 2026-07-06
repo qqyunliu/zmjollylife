@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easyjava.mappers.SearchKeywordMapper">
+    
+    <resultMap id="base_result_map" type="com.easyjava.entity.po.SearchKeyword">
+        <result column="id" property="id"/>
+        <result column="keyword" property="keyword"/>
+        <result column="search_count" property="searchCount"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <select id="selectTopKeyword" resultMap="base_result_map">
+        SELECT * FROM search_keyword 
+        ORDER BY search_count DESC
+        LIMIT #{limit}
+    </select>
+    
+    <select id="selectByKeyword" resultMap="base_result_map">
+        SELECT * FROM search_keyword WHERE keyword = #{keyword}
+    </select>
+    
+    <update id="updateSearchCount">
+        UPDATE search_keyword SET search_count = search_count + 1 WHERE keyword = #{keyword}
+    </update>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO search_keyword (keyword, search_count, create_time)
+        VALUES (#{bean.keyword}, 1, #{bean.createTime})
+    </insert>
+</mapper>
