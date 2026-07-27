@@ -11,6 +11,8 @@ import com.easyjava.entity.query.UserInfoquery;
 import com.easyjava.entity.query.VideoInfoPostquery;
 import com.easyjava.entity.vo.PaginationResultVO;
 import com.easyjava.entity.vo.ResponseVO;
+import com.easyjava.enums.ResponseCodeEnum;
+import com.easyjava.exception.BusinessException;
 import com.easyjava.service.AiAuditService;
 import com.easyjava.service.UserActionService;
 import com.easyjava.service.UserFocusService;
@@ -141,8 +143,11 @@ public class UcenterController extends ABaseController {
     }
 
     @RequestMapping("/loadUserCollection")
-    public ResponseVO loadUserCollection(Integer pageNo) {
+    public ResponseVO loadUserCollection(Integer pageNo) throws BusinessException {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();
+        if (tokenUserInfoDto == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
         List<UserAction> collectList = userActionService.getUserActionList(tokenUserInfoDto.getUserId(), 3);
         return getSuccessResponseVO(collectList);
     }

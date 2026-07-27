@@ -20,7 +20,7 @@ public class Constans {
     public static final String FILE_FOLDER_TEMP = "temp/";
     public static final String TOKEN_WEB = "token";
     public static final String TOKEN_ADMIN = "adminToken";
-    public static final String REDIS_KEY_CHECK_CODE = "adminToken";
+    public static final String REDIS_KEY_CHECK_CODE = REDIS_KEY_PREFIX + "checkcode:";
     public static final String REDIS_KEY_CATEGORY_LIST = REDIS_KEY_PREFIX + "category:list:";
     public static final String REDIS_KEY_TOKEN_WEB = REDIS_KEY_PREFIX + "token:web:";
     public static final String REDIS_KEY_TOKEN_ADMIN = REDIS_KEY_PREFIX + "token:admin:";

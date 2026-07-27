@@ -91,6 +91,7 @@
 
 <script setup>
 import { ref, computed, watch, getCurrentInstance } from "vue";
+import { ElMessageBox } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
@@ -197,20 +198,18 @@ const login = () => {
   loginStore.setLogin(true);
 };
 
-const logout = () => {
-  if (confirm('确定要退出登录吗？')) {
-    try {
-      if (typeof loginStore.logout === 'function') {
-        loginStore.logout();
-      } else {
-        loginStore.userInfo = {};
-      }
-      showUserPanel.value = false;
-      router.push('/');
-    } catch (error) {
-      console.error('退出登录失败:', error);
-    }
+const logout = async () => {
+  try {
+    await ElMessageBox.confirm('确定要退出登录吗？', '提示', { type: 'warning' });
+  } catch {
+    return;
   }
+  await proxy.request({
+    url: proxy.Api.logout,
+  });
+  loginStore.clearUserInfo();
+  showUserPanel.value = false;
+  router.push('/');
 };
 
 const navJump = (url) => {

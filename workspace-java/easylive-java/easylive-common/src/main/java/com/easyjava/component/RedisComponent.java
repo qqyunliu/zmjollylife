@@ -108,6 +108,13 @@ public class RedisComponent {
         redisUtils.delete(Constans.REDIS_KEY_TOKEN_ADMIN + token);
     }
 
+    public void cleanTokenWeb(String token) {
+        if (StringTools.isEmpty(token)) {
+            return;
+        }
+        redisUtils.delete(Constans.REDIS_KEY_TOKEN_WEB + token);
+    }
+
     public void saveCategoryList(List<CategoryInfo> categoryInfoList) {
         /*
          分类信息缓存

@@ -11,6 +11,7 @@ import com.easyjava.entity.query.VideoInfoquery;
 import com.easyjava.entity.vo.PaginationResultVO;
 import com.easyjava.entity.vo.ResponseVO;
 import com.easyjava.entity.vo.VideoStatusCountInfoVO;
+import com.easyjava.enums.ResponseCodeEnum;
 import com.easyjava.enums.VideoStatusEnum;
 import com.easyjava.exception.BusinessException;
 import com.easyjava.service.VideoInfoFilePostService;
@@ -84,6 +85,9 @@ public class UcenterVideoPostController extends ABaseController {
                                 @NotEmpty String uploadFileList
     ) throws BusinessException {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();
+        if (tokenUserInfoDto == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
         List<VideoInfoFilePost> filePostList = JsonUtils.convertJsonArray2list(uploadFileList, VideoInfoFilePost.class);
         VideoInfoPost videoInfoPost = new VideoInfoPost();
         videoInfoPost.setVideoId(videoId);
@@ -121,6 +125,9 @@ public class UcenterVideoPostController extends ABaseController {
     public ResponseVO loadVideoList
             (Integer status, Integer pageNo, String videoNameFuzzy) throws BusinessException {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();
+        if (tokenUserInfoDto == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
         VideoInfoPostquery videoInfoQuery = new VideoInfoPostquery();
 
         videoInfoQuery.setUserId(tokenUserInfoDto.getUserId());
@@ -166,6 +173,9 @@ VideoStatusCountInfoVO {
     @RequestMapping("/getVideoCountInfo")
     public ResponseVO getVideoCountInfo()throws BusinessException {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();
+        if (tokenUserInfoDto == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
         VideoInfoPostquery videoInfoPostquery=new VideoInfoPostquery();
         videoInfoPostquery.setUserId(tokenUserInfoDto.getUserId());
         videoInfoPostquery.setStatus(VideoStatusEnum.STATUS3.getStatus());
@@ -188,8 +198,11 @@ VideoStatusCountInfoVO {
 
     /*加载用户所有视频（审核通过的）*/
     @RequestMapping("/loadAllVideo")
-    public ResponseVO loadAllVideo(Integer pageNo) {
+    public ResponseVO loadAllVideo(Integer pageNo) throws BusinessException {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();
+        if (tokenUserInfoDto == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
         VideoInfoquery videoInfoQuery = new VideoInfoquery();
         videoInfoQuery.setUserId(tokenUserInfoDto.getUserId());
         videoInfoQuery.setStatus(3);

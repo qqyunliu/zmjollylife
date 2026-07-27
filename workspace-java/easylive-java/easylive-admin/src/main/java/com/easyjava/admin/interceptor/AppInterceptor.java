@@ -4,6 +4,7 @@ import com.easyjava.entity.constants.Constans;
 import com.easyjava.enums.ResponseCodeEnum;
 import com.easyjava.exception.BusinessException;
 import com.easyjava.utlis.StringTools;
+import com.easyjava.utlis.TokenContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -24,19 +25,15 @@ public class AppInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws BusinessException {
         if(null==handler){
-            return false;
+            return true;
         }
         if(!(handler instanceof HandlerMethod)){
-            return false;
+            return true;
         }
         if(request.getRequestURI().contains(URL_ACCOUNT)){
             return true;
         }
-        String token =request.getHeader(Constans.TOKEN_ADMIN);
-        //获取图片
-        if(request.getRequestURI().contains(URL_FILE)){
-            token=getTokenFromCookie(request);
-        }
+        String token = getTokenFromCookie(request);
         if(StringTools.isEmpty(token)){
             throw new BusinessException(ResponseCodeEnum.CODE_901);
         }
@@ -67,6 +64,6 @@ public class AppInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
+        TokenContext.remove();
     }
 }

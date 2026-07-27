@@ -22,7 +22,6 @@ const route = useRoute();
 const router = useRouter();
 
 
-import VueCookies from "vue-cookies";
 import { Api } from "./utils/Api.js"
 import Request from "./utils/Request.js"
 const loginStore = useLoginStore();
@@ -44,14 +43,10 @@ const getSysSetting = async () => {
 
 
 const autoLogin = async () => {
-  const token = VueCookies.get('token');
-  if (!token) {
-    return;
-  }
   let result = await proxy.request({
     url: proxy.Api.autoLogin,
   });
-  if (!result) {
+  if (!result || !result.data) {
     return;
   }
   saveLoginInfo(result.data);

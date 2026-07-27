@@ -11,7 +11,6 @@ import Avatar from './components/Avatar.vue';
 import VideoItem from './components/VideoItem.vue';
 import App from './App.vue';
 import router from './router';
-import VueCookies from 'vue-cookies';
 import Verify from './utils/Verify';
 import request from './utils/Request';
 import Message from './utils/Message';
@@ -27,7 +26,6 @@ app.component('Avatar', Avatar);
 app.component('VideoItem', VideoItem);
 app.use(createPinia());
 app.use(router);
-app.config.globalProperties.VueCookies = VueCookies;
 app.config.globalProperties.bodyMaxWidth = 2000;
 app.config.globalProperties.bodyMinWidth = 1250;
 

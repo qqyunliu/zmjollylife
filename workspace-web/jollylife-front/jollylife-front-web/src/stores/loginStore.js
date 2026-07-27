@@ -19,6 +19,10 @@ export const useLoginStore = defineStore('loginStore', {
     },
     saveUserInfo(Info) {
       this.userInfo = Info
+    },
+    clearUserInfo() {
+      this.userInfo = {}
+      this.showLogin = false
     }
   }
 })

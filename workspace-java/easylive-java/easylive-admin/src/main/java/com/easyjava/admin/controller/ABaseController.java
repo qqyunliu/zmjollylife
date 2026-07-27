@@ -5,6 +5,7 @@ import com.easyjava.entity.constants.Constans;
 import com.easyjava.entity.dto.TokenUserInfoDto;
 import com.easyjava.entity.vo.ResponseVO;
 import com.easyjava.enums.ResponseCodeEnum;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -12,8 +13,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-;
 
 public class ABaseController {
     @Resource
@@ -62,10 +61,13 @@ public class ABaseController {
     }
 
     protected void saveToken2Cookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie(Constans.TOKEN_ADMIN, token);
-        cookie.setMaxAge(-1);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(Constans.TOKEN_ADMIN, token)
+                .path("/")
+                .maxAge(-1)
+                .httpOnly(true)
+                .sameSite("Lax")
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 
 
@@ -76,14 +78,17 @@ public class ABaseController {
             return;
         }
         for(Cookie cookie:cookies){
-            if(cookie.getName().equals((Constans.TOKEN_ADMIN))){
-                redisComponent.cleanCheckCode(cookie.getValue());
-                cookie.setMaxAge(0);
-                cookie.setPath("/");
-                response.addCookie(cookie);
+            if(cookie.getName().equals(Constans.TOKEN_ADMIN)){
+                redisComponent.cleanToken4Admin(cookie.getValue());
                 break;
             }
         }
-
+        ResponseCookie expiredCookie = ResponseCookie.from(Constans.TOKEN_ADMIN, "")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .sameSite("Lax")
+                .build();
+        response.addHeader("Set-Cookie", expiredCookie.toString());
     }
 }

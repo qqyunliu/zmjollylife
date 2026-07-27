@@ -191,8 +191,11 @@ public class FileController extends ABaseController {
 - 记录上传元信息，支持断点续传
 - 在Redis中管理上传状态*/
     @RequestMapping("/preUploadVideo")
-    public ResponseVO preUploadVideo(@NotEmpty String fileName, @NotNull Integer chunks) {
+    public ResponseVO preUploadVideo(@NotEmpty String fileName, @NotNull Integer chunks) throws BusinessException {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();
+        if (tokenUserInfoDto == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
         String uploadId = redisComponent.savePreVideoFileInfo(tokenUserInfoDto.getUserId(), fileName, chunks);
         return getSuccessResponseVO(uploadId);
     }
@@ -261,6 +264,9 @@ java📥 参数：uploadId
     public ResponseVO uploadVideo(@NotNull MultipartFile chunkFile, @NotNull Integer chunkIndex, @NotEmpty String uploadId) throws BusinessException, IOException {
 
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();
+        if (tokenUserInfoDto == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
         UploadingFileDto fileDto = redisComponent.getUploadVideoFile(tokenUserInfoDto.getUserId(), uploadId);
         if (chunkIndex == null) {
             throw new BusinessException("分片索引不能为空");
@@ -300,6 +306,9 @@ java📥 参数：uploadId
     @RequestMapping("/delUploadVideo")
     public ResponseVO delUploadVideo(@NotEmpty String uploadId) throws BusinessException, IOException {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();
+        if (tokenUserInfoDto == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
         UploadingFileDto fileDto = redisComponent.getUploadVideoFile(tokenUserInfoDto.getUserId(), uploadId);
         if (fileDto == null) {
             throw new BusinessException("文件不存在");

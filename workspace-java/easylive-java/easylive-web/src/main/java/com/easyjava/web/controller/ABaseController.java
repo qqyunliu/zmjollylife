@@ -6,6 +6,7 @@ import com.easyjava.entity.dto.TokenUserInfoDto;
 import com.easyjava.enums.ResponseCodeEnum;
 import com.easyjava.entity.vo.ResponseVO;
 import com.easyjava.utlis.TokenContext;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -13,7 +14,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.annotation.Repeatable;
 
 public class ABaseController {
     @Resource
@@ -72,49 +72,37 @@ public class ABaseController {
     }
 
     protected void saveToken2Cookie(HttpServletResponse response, String token) {
-        /*保存Token到Cookie：
-        * 创建名为TOKEN_WEB的Cookie
-        设置7天有效期（TIME_SECONDS_DAY * 7）
-        路径设置为根路径"/"，使整个应用可访问*/
-        Cookie cookie = new Cookie(Constans.TOKEN_WEB, token);
-        cookie.setMaxAge((Constans.TIME_SECONDS_DAY * 7));
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(Constans.TOKEN_WEB, token)
+                .path("/")
+                .maxAge(Constans.TIME_SECONDS_DAY * 7)
+                .httpOnly(true)
+                .sameSite("Lax")
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 
     protected TokenUserInfoDto getTokenUserInfoDto() {
-        /*获取Token用户信息：
-        * 从请求头获取Token（request.getHeader(Constans.TOKEN_WEB)）
-        通过Redis查询Token对应的用户信息
-        问题：缺少空值检查和异常处理*/
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token = request.getHeader(Constans.TOKEN_WEB);
-        TokenUserInfoDto userInfo = (TokenUserInfoDto)redisComponent.getTokenInfo(token);
-        if (userInfo != null) {
-            TokenContext.set(userInfo);
-        }
-        return userInfo;
+        return TokenContext.get();
     }
+
     protected void cleanCookie(HttpServletResponse response){
-        /*清理Cookie和Token：
-        遍历请求中的所有Cookie
-        找到Token对应的Cookie
-        从Redis删除Token信息
-        设置Cookie过期时间为0（立即失效）*/
         HttpServletRequest request=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
         Cookie[] cookies=request.getCookies();
         if(cookies==null){
             return;
         }
         for(Cookie cookie:cookies){
-            if(cookie.getName().equals((Constans.TOKEN_WEB))){
-                redisComponent.cleanCheckCode(cookie.getValue());
-                cookie.setMaxAge(0);
-                cookie.setPath("/");
-                response.addCookie(cookie);
+            if(cookie.getName().equals(Constans.TOKEN_WEB)){
+                redisComponent.cleanTokenWeb(cookie.getValue());
                 break;
             }
         }
-
+        ResponseCookie expiredCookie = ResponseCookie.from(Constans.TOKEN_WEB, "")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .sameSite("Lax")
+                .build();
+        response.addHeader("Set-Cookie", expiredCookie.toString());
     }
 }

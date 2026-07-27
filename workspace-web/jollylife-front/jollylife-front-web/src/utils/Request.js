@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { ElLoading } from 'element-plus'
 import Message from '../utils/Message'
-import VueCookies from 'vue-cookies'
 
 import { useLoginStore } from "@/stores/loginStore"
 
@@ -79,11 +78,9 @@ const request = (config) => {
     if (dataType != null && dataType == 'json') {
         contentType = contentTypeJson;
     }
-    const token = VueCookies.get('token')
     let headers = {
         'Content-Type': contentType,
         'X-Requested-With': 'XMLHttpRequest',
-        "token": token
     }
     return instance.post(url, formData, {
         onUploadProgress: (event) => {
